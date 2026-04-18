@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parikshit Tyagi — Solidity Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --surface: #141414;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5ff;
+    --accent2: #7c3aff;
+    --green: #00ff88;
+    --text: #f0f0f0;
+    --muted: #888;
+    --card-hover: rgba(0, 229, 255, 0.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Fira Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.25s ease, height 0.25s ease, border-color 0.25s;
+  }
+  body:has(a:hover) .cursor-ring,
+  body:has(button:hover) .cursor-ring {
+    width: 56px; height: 56px;
+    border-color: var(--accent);
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.4s, background 0.4s, backdrop-filter 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(8,8,8,0.85);
+    border-color: var(--border);
+    backdrop-filter: blur(20px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 2rem; }
+  .nav-socials {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border);
+  }
+  .nav-social-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 4px;
+    color: var(--muted);
+    transition: color 0.25s, background 0.25s, transform 0.25s;
+    cursor: none;
+    text-decoration: none;
+  }
+  .nav-social-link:hover {
+    color: var(--accent);
+    background: rgba(0,229,255,0.1);
+    transform: translateY(-2px);
+  }
+  .nav-social-link svg {
+    width: 16px; height: 16px;
+    fill: currentColor;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+    cursor: none;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  /* HIRE ME BUTTON */
+  .btn-hire {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.55rem 1.4rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #000;
+    background: var(--accent);
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    cursor: none;
+    white-space: nowrap;
+  }
+  .btn-hire::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-hire span { position: relative; z-index: 1; }
+  .btn-hire:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0,229,255,0.4), 0 0 60px rgba(0,229,255,0.15);
+  }
+  .btn-hire:hover::before { opacity: 1; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 0 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 30%, transparent 100%);
+  }
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,255,0.07) 0%, transparent 70%);
+    top: 50%; left: 30%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  }
+  .hero-content { position: relative; max-width: 900px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-name .line2 {
+    display: block;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+    color: transparent;
+  }
+  .hero-name .line2 .fill {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 540px;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-desc strong { color: var(--text); font-weight: 400; }
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn {
+    cursor: none;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    font-weight: 500;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,229,255,0.3);
+  }
+  .btn-ghost {
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 3rem; right: 3rem;
+    writing-mode: vertical-rl;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    50.1% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  .stat-item {
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    line-height: 1;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; }
+
+  /* SECTION LAYOUT */
+  section { padding: 7rem 3rem; }
+  .section-header {
+    display: flex; align-items: center; gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+  .section-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .section-line {
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* REVEAL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  /* PROJECTS */
+  #projects { background: var(--bg); }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+  }
+  .project-card {
+    position: relative;
+    padding: 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: background 0.3s, border-color 0.3s, transform 0.4s cubic-bezier(0.23,1,0.32,1);
+    cursor: none;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+  .project-card:hover {
+    background: var(--card-hover);
+    border-color: rgba(0,229,255,0.2);
+    transform: translateY(-4px);
+    z-index: 2;
+  }
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-card.featured {
+    grid-column: span 2;
+  }
+  .project-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 2px;
+  }
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .project-desc {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .project-bullets {
+    list-style: none;
+    margin-bottom: 2rem;
+  }
+  .project-bullets li {
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 0.4rem 0;
+    padding-left: 1rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    line-height: 1.6;
+  }
+  .project-bullets li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--accent);
+    font-size: 0.7rem;
+  }
+  .project-stack {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .stack-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .project-card:hover .stack-tag {
+    color: var(--text);
+    border-color: rgba(0,229,255,0.2);
+  }
+  .project-links { display: flex; gap: 1rem; }
+  .project-link {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 0.3rem;
+    transition: color 0.2s;
+    cursor: none;
+  }
+  .project-link:hover { color: var(--accent); }
+  .project-link .arrow {
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .project-link:hover .arrow { transform: translate(2px, -2px); }
+  .project-num {
+    position: absolute; top: 2rem; right: 2.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .project-card:hover .project-num { color: rgba(0,229,255,0.06); }
+
+  /* SKILLS */
+  #skills { background: var(--bg2); }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .skill-group {
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: var(--surface);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .skill-group:hover {
+    border-color: rgba(0,229,255,0.25);
+    transform: translateY(-2px);
+  }
+  .skill-group-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .skill-group-label::before {
+    content: '';
+    width: 16px; height: 1px;
+    background: var(--accent);
+  }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .skill-pill {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .skill-pill:hover {
+    background: rgba(0,229,255,0.08);
+    border-color: rgba(0,229,255,0.4);
+    color: var(--accent);
+  }
+
+  /* EXPERIENCE */
+  #experience { background: var(--bg); }
+  .exp-list { display: flex; flex-direction: column; }
+  .exp-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--border);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .exp-item::before {
+    content: '';
+    position: absolute; left: -3rem; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.5s ease;
+  }
+  .exp-item:hover::before { transform: scaleY(1); }
+  .exp-meta {}
+  .exp-date { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .exp-company {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .exp-role { font-size: 0.8rem; color: var(--accent); }
+  .exp-details {}
+  .exp-bullets { list-style: none; }
+  .exp-bullets li {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--muted);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 0.7rem;
+  }
+  .exp-bullets li::before {
+    content: '//';
+    color: var(--accent);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--bg2);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 20s linear infinite;
+    width: max-content;
+  }
+  .marquee-section:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee-item {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 1.5rem;
+    text-transform: uppercase;
+  }
+  .marquee-item::after {
+    content: '✦';
+    color: var(--accent);
+    font-size: 0.6rem;
+  }
+
+  /* CONTACT */
+  #contact { background: var(--bg2); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .contact-big {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+  .contact-big .accent { color: var(--accent); }
+  .contact-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    max-width: 380px;
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 1.5rem; }
+  .contact-link-item {
+    display: flex; align-items: center; gap: 1rem;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.82rem;
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: var(--surface);
+    transition: all 0.3s;
+    cursor: none;
+  }
+  .contact-link-item:hover {
+    border-color: rgba(0,229,255,0.3);
+    color: var(--text);
+    transform: translateX(8px);
+  }
+  .contact-link-icon {
+    width: 32px; height: 32px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .contact-link-label { font-size: 0.65rem; color: var(--muted); display: block; margin-bottom: 0.15rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .contact-link-value { font-size: 0.82rem; color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem 3rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+  }
+  .footer-logo span { color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CANVAS BG */
+  #bg-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+  #hero, nav, .stats-bar, section, footer, .marquee-section {
+    position: relative; z-index: 1;
+  }
+
+  /* STATUS DOT */
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    margin-right: 0.4rem;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 1.5rem; }
+    .nav-links { display: none; }
+    .nav-socials { border-left: none; padding-left: 0; }
+    .nav-right { gap: 0.8rem; }
+    #hero { padding: 8rem 1.5rem 4rem; }
+    .stats-bar { grid-template-columns: repeat(2,1fr); padding: 2rem 1.5rem; }
+    section { padding: 4rem 1.5rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card.featured { grid-column: span 1; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .exp-item { grid-template-columns: 1fr; gap: 1.5rem; }
+    .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+    footer { padding: 2rem 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="cursor cursor-dot" id="cursor-dot"></div>
+<div class="cursor cursor-ring" id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">PT<span>.</span></a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-socials">
+      <a href="https://www.linkedin.com/in/parikshit-tyagi-3bb63a30a/" target="_blank" rel="noopener noreferrer" class="nav-social-link" title="LinkedIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="https://github.com/h4ckt0zit3" target="_blank" rel="noopener noreferrer" class="nav-social-link" title="GitHub">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+    </div>
+    <a href="#contact" class="btn-hire"><span>Hire Me →</span></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="status-dot"></span>Open to internships — Bengaluru, India
+    </div>
+    <h1 class="hero-name">
+      Parikshit<br>
+      <span class="line2"><span class="fill">Tyagi</span></span>
+    </h1>
+    <p class="hero-desc">
+      <strong>Solidity Developer & Blockchain Security Researcher.</strong> Building production-grade smart contracts on Ethereum — DeFi protocols, on-chain verification systems, and applied contract security. B.Tech Blockchain Technology @ Jain University.
+    </p>
+    <div class="hero-cta">
+      <a href="https://github.com/h4ckt0zit3" class="btn btn-primary">github.com/h4ckt0zit3 ↗</a>
+      <a href="mailto:tyagiparikshit02@gmail.com" class="btn btn-ghost">tyagiparikshit02@gmail.com</a>
+    </div>
+  </div>
+  <div class="hero-scroll">scroll</div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item reveal">
+    <div class="stat-num" data-count="2">0<span>+</span></div>
+    <div class="stat-label">Live dApps on Sepolia</div>
+  </div>
+  <div class="stat-item reveal" style="transition-delay:0.1s">
+    <div class="stat-num" data-count="27">0<span>+</span></div>
+    <div class="stat-label">Hardhat Unit Tests</div>
+  </div>
+  <div class="stat-item reveal" style="transition-delay:0.2s">
+    <div class="stat-num" data-count="100">0<span>+</span></div>
+    <div class="stat-label">C3 Community Members</div>
+  </div>
+  <div class="stat-item reveal" style="transition-delay:0.3s">
+    <div class="stat-num" data-count="50">0<span>+</span></div>
+    <div class="stat-label">CTF Platform Users</div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <div class="marquee-item">Solidity 0.8.20+</div>
+    <div class="marquee-item">Hardhat</div>
+    <div class="marquee-item">OpenZeppelin v5</div>
+    <div class="marquee-item">ethers.js v6</div>
+    <div class="marquee-item">Foundry</div>
+    <div class="marquee-item">React 18</div>
+    <div class="marquee-item">DeFi Protocols</div>
+    <div class="marquee-item">Smart Contract Security</div>
+    <div class="marquee-item">CTF Competitions</div>
+    <div class="marquee-item">Ethereum Sepolia</div>
+    <div class="marquee-item">ReentrancyGuard</div>
+    <div class="marquee-item">CEI Pattern</div>
+    <div class="marquee-item">Slither</div>
+    <div class="marquee-item">Solidity 0.8.20+</div>
+    <div class="marquee-item">Hardhat</div>
+    <div class="marquee-item">OpenZeppelin v5</div>
+    <div class="marquee-item">ethers.js v6</div>
+    <div class="marquee-item">Foundry</div>
+    <div class="marquee-item">React 18</div>
+    <div class="marquee-item">DeFi Protocols</div>
+    <div class="marquee-item">Smart Contract Security</div>
+    <div class="marquee-item">CTF Competitions</div>
+    <div class="marquee-item">Ethereum Sepolia</div>
+    <div class="marquee-item">ReentrancyGuard</div>
+    <div class="marquee-item">CEI Pattern</div>
+    <div class="marquee-item">Slither</div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header">
+    <span class="section-num">01 //</span>
+    <h2 class="section-title reveal">Projects</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="projects-grid">
+
+    <div class="project-card featured reveal">
+      <div class="project-num">01</div>
+      <span class="project-tag">DeFi Protocol</span>
+      <h3 class="project-title">StakeForge</h3>
+      <p class="project-desc">Two-contract DeFi staking system with tiered APY logic deployed on Ethereum Sepolia. ERC-20 token + staking pool with time-locked positions and automated reward accrual.</p>
+      <ul class="project-bullets">
+        <li>Tiered APY across 30-, 90-, 180-day lock periods — up to 20% annualised yield</li>
+        <li>ReentrancyGuard + CEI pattern on unstake() and claimRewards() — ~15% gas reduction via custom errors</li>
+        <li>27-test Hardhat suite: stake/unstake flows, reentrancy attack simulation, time-lock manipulation</li>
+        <li>Live React dashboard with real-time reward counters and MetaMask integration</li>
+      </ul>
+      <div class="project-stack">
+        <span class="stack-tag">Solidity 0.8.20+</span>
+        <span class="stack-tag">Hardhat</span>
+        <span class="stack-tag">OpenZeppelin v5</span>
+        <span class="stack-tag">ethers.js v6</span>
+        <span class="stack-tag">React + Vite</span>
+        <span class="stack-tag">ERC-20</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/h4ckt0zit3/StakeForge" class="project-link">GitHub <span class="arrow">↗</span></a>
+        <a href="https://stake-forge.vercel.app" class="project-link">Live Demo <span class="arrow">↗</span></a>
+      </div>
+    </div>
+
+    <div class="project-card reveal" style="transition-delay:0.15s">
+      <div class="project-num">02</div>
+      <span class="project-tag">On-Chain Verification</span>
+      <h3 class="project-title">ProofChain</h3>
+      <p class="project-desc">Role-gated certificate verification system. Immutable on-chain hash storage with three-tier access control — Admin, Institution, Public.</p>
+      <ul class="project-bullets">
+        <li>Whitelisting enforced at contract level — unauthorised issuance is a hard revert</li>
+        <li>React frontend with RoleGuard routing, live event log, and MetaMask toasts</li>
+        <li>Full NatSpec coverage on every public function</li>
+      </ul>
+      <div class="project-stack">
+        <span class="stack-tag">Solidity 0.8.20+</span>
+        <span class="stack-tag">Hardhat</span>
+        <span class="stack-tag">ethers.js v6</span>
+        <span class="stack-tag">React 18</span>
+        <span class="stack-tag">RBAC</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/h4ckt0zit3/ProofChain" class="project-link">GitHub <span class="arrow">↗</span></a>
+        <a href="https://proof-chain-one.vercel.app" class="project-link">Live Demo <span class="arrow">↗</span></a>
+      </div>
+    </div>
+
+    <div class="project-card reveal" style="transition-delay:0.3s">
+      <div class="project-num">03</div>
+      <span class="project-tag">Cybersecurity Platform</span>
+      <h3 class="project-title">Cipher Chamber</h3>
+      <p class="project-desc">Full-stack live CTF platform for 50+ concurrent participants. Real-time scoring with attempt-limiting, dynamic point decay, and zero downtime during live events.</p>
+      <ul class="project-bullets">
+        <li>Cryptographic challenges: hash collisions, symmetric encryption, key derivation</li>
+        <li>Real-time Firebase backend with per-team hint system</li>
+        <li>Zero-downtime operation across 50+ simultaneous participants</li>
+      </ul>
+      <div class="project-stack">
+        <span class="stack-tag">React</span>
+        <span class="stack-tag">Firebase</span>
+        <span class="stack-tag">JavaScript</span>
+        <span class="stack-tag">Cryptography</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/h4ckt0zit3" class="project-link">GitHub <span class="arrow">↗</span></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header">
+    <span class="section-num">02 //</span>
+    <h2 class="section-title reveal">Skills</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-group reveal">
+      <div class="skill-group-label">Smart Contracts</div>
+      <div class="skill-tags">
+        <span class="skill-pill">Solidity 0.8.20+</span>
+        <span class="skill-pill">OpenZeppelin v5</span>
+        <span class="skill-pill">ERC-20</span>
+        <span class="skill-pill">ReentrancyGuard</span>
+        <span class="skill-pill">SafeERC20</span>
+        <span class="skill-pill">CEI Pattern</span>
+        <span class="skill-pill">Custom Errors</span>
+        <span class="skill-pill">NatSpec</span>
+        <span class="skill-pill">Access Control</span>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.1s">
+      <div class="skill-group-label">Dev Tooling</div>
+      <div class="skill-tags">
+        <span class="skill-pill">Hardhat</span>
+        <span class="skill-pill">Foundry</span>
+        <span class="skill-pill">forge / cast / anvil</span>
+        <span class="skill-pill">ethers.js v6</span>
+        <span class="skill-pill">Web3.js</span>
+        <span class="skill-pill">Hardhat-Chai-Matchers</span>
+        <span class="skill-pill">Sepolia Testnet</span>
+        <span class="skill-pill">Etherscan Verification</span>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.2s">
+      <div class="skill-group-label">Frontend & Web3</div>
+      <div class="skill-tags">
+        <span class="skill-pill">React 18</span>
+        <span class="skill-pill">Vite</span>
+        <span class="skill-pill">Tailwind CSS</span>
+        <span class="skill-pill">MetaMask Integration</span>
+        <span class="skill-pill">Wallet Hooks</span>
+        <span class="skill-pill">Node.js</span>
+        <span class="skill-pill">WebRTC</span>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.3s">
+      <div class="skill-group-label">Security & Languages</div>
+      <div class="skill-tags">
+        <span class="skill-pill">Slither</span>
+        <span class="skill-pill">Smart Contract Auditing</span>
+        <span class="skill-pill">Reentrancy Analysis</span>
+        <span class="skill-pill">CTF Competitions</span>
+        <span class="skill-pill">Linux</span>
+        <span class="skill-pill">Python</span>
+        <span class="skill-pill">Java</span>
+        <span class="skill-pill">Bash</span>
+        <span class="skill-pill">SQL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header">
+    <span class="section-num">03 //</span>
+    <h2 class="section-title reveal">Experience</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="exp-list">
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-date">Aug 2024 — Present</div>
+        <div class="exp-company">Crypto Collaborative Cell</div>
+        <div class="exp-role">Tech Co-Lead · Jain University</div>
+      </div>
+      <div class="exp-details">
+        <ul class="exp-bullets">
+          <li>Grew Web3 community from zero to 100+ active members in 6 months — 200% growth through 10+ Solidity and DeFi workshops</li>
+          <li>Sourced and onboarded 5+ industry speakers, secured blockchain company sponsorships exposing students to production-grade Web3</li>
+          <li>Organised multi-round technical events including NFT auction simulations and smart contract security challenges</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item reveal" style="transition-delay:0.1s">
+      <div class="exp-meta">
+        <div class="exp-date">Mar 2026 — Present</div>
+        <div class="exp-company">Paytm</div>
+        <div class="exp-role">Campus Ambassador · Bengaluru</div>
+      </div>
+      <div class="exp-details">
+        <ul class="exp-bullets">
+          <li>Executed fintech adoption campaigns across 5,000+ student population with measurable wallet activation growth</li>
+          <li>Organised financial literacy sessions converting student engagement into measurable product adoption</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item reveal" style="transition-delay:0.2s">
+      <div class="exp-meta">
+        <div class="exp-date">Aug 2025 — Nov 2025</div>
+        <div class="exp-company">Perplexity AI</div>
+        <div class="exp-role">Campus Ambassador · Bengaluru</div>
+      </div>
+      <div class="exp-details">
+        <ul class="exp-bullets">
+          <li>Drove AI adoption across 5,000+ students as one of Perplexity's Fall 2025 Campus Partners</li>
+          <li>Built integration with 5+ student organisations, delivered 4 demo sessions with measurable monthly active user growth</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item reveal" style="transition-delay:0.3s">
+      <div class="exp-meta">
+        <div class="exp-date">Aug 2024 — Aug 2028</div>
+        <div class="exp-company">Jain University</div>
+        <div class="exp-role">B.Tech Blockchain Technology</div>
+      </div>
+      <div class="exp-details">
+        <ul class="exp-bullets">
+          <li>Specialised program covering Data Structures, Computer Networks & Security, Cryptography, Microprocessors</li>
+          <li>Active researcher in smart contract security and on-chain attack vector analysis</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="reveal-left">
+      <h2 class="contact-big">Let's<br>Build<br><span class="accent">Together.</span></h2>
+      <p class="contact-sub">
+        Looking for a Solidity developer internship. Targeting Web3 companies focused on DeFi security, protocol development, and smart contract auditing. 45-day runway — available immediately.
+      </p>
+      <a href="mailto:tyagiparikshit02@gmail.com" class="btn btn-primary" style="display:inline-flex;">Send Message ↗</a>
+    </div>
+    <div class="contact-links reveal">
+      <a href="mailto:tyagiparikshit02@gmail.com" class="contact-link-item">
+        <div class="contact-link-icon">@</div>
+        <div>
+          <span class="contact-link-label">Email</span>
+          <span class="contact-link-value">tyagiparikshit02@gmail.com</span>
+        </div>
+      </a>
+      <a href="https://github.com/h4ckt0zit3" class="contact-link-item">
+        <div class="contact-link-icon">{ }</div>
+        <div>
+          <span class="contact-link-label">GitHub</span>
+          <span class="contact-link-value">github.com/h4ckt0zit3</span>
+        </div>
+      </a>
+      <a href="https://www.linkedin.com/in/parikshit-tyagi-3bb63a30a/" target="_blank" rel="noopener noreferrer" class="contact-link-item">
+        <div class="contact-link-icon">in</div>
+        <div>
+          <span class="contact-link-label">LinkedIn</span>
+          <span class="contact-link-value">linkedin.com/in/parikshit-tyagi-3bb63a30a</span>
+        </div>
+      </a>
+      <a href="https://stake-forge.vercel.app" class="contact-link-item">
+        <div class="contact-link-icon">⬡</div>
+        <div>
+          <span class="contact-link-label">Live Project</span>
+          <span class="contact-link-value">stake-forge.vercel.app</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PT<span>.</span></div>
+  <span>Parikshit Tyagi — Solidity Developer — Bengaluru, India</span>
+  <span>B.Tech Blockchain Technology · Jain University · 2024–2028</span>
+</footer>
+
+<script>
+// CUSTOM CURSOR
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+// NAV SCROLL
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// INTERSECTION OBSERVER
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal, .reveal-left').forEach(el => observer.observe(el));
+
+// COUNTER ANIMATION
+function animCount(el, target, duration) {
+  let start = null;
+  const step = ts => {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.childNodes[0].textContent = Math.floor(ease * target);
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const countObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const target = parseInt(e.target.dataset.count);
+      animCount(e.target, target, 1200);
+      countObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num[data-count]').forEach(el => countObserver.observe(el));
+
+// CANVAS PARTICLES
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+function Particle() {
+  this.x = Math.random() * W;
+  this.y = Math.random() * H;
+  this.size = Math.random() * 1.2 + 0.3;
+  this.vx = (Math.random() - 0.5) * 0.15;
+  this.vy = (Math.random() - 0.5) * 0.15;
+  this.alpha = Math.random() * 0.4 + 0.1;
+}
+for (let i = 0; i < 80; i++) particles.push(new Particle());
+function drawCanvas() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0 || p.x > W) p.vx *= -1;
+    if (p.y < 0 || p.y > H) p.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,229,255,${p.alpha})`;
+    ctx.fill();
+  });
+  // draw connections
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i+1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(0,229,255,${0.05 * (1 - dist/120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawCanvas);
+}
+drawCanvas();
+</script>
+</body>
+</html>
